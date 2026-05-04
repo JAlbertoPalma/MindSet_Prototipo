@@ -24,7 +24,9 @@
   body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg);
-    color: #e4e4e7;
+    /* FIX 1 & 2: Texto más visible y más grande - base color más claro, tamaño base mayor */
+    color: #f0f0f2;
+    font-size: 1.05rem;
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
   }
@@ -58,16 +60,26 @@
   /* Like button active */
   .heart-active { color: #ef4444 !important; fill: #ef4444; }
 
+  /* FIX 7: Section nav - full width stretch */
+  .sec-nav-wrap {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+  }
+
   /* Section nav buttons */
   .sec-btn {
     white-space: nowrap;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    transition: border-color 0.2s, color 0.2s;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
     border: 1px solid transparent;
+    text-align: center;
+    width: 100%;
   }
-  .sec-btn.active { border-color: var(--accent); color: var(--accent); }
+  .sec-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(251,191,36,0.08); }
 
   /* Quote card serif font */
   .quote-serif { font-family: 'Playfair Display', serif; font-style: italic; }
@@ -96,6 +108,60 @@
     pointer-events: none;
     z-index: 0;
   }
+
+  /* FIX 3: Carousel pc - bigger cards on desktop */
+  .carousel-card {
+    flex-shrink: 0;
+    width: 13rem; /* mobile default */
+    height: 18rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .carousel-card:hover { border-color: rgba(251,191,36,0.3); transform: scale(1.02); }
+
+  @media (min-width: 768px) {
+    .carousel-card {
+      width: 19rem;
+      height: 26rem;
+    }
+  }
+
+  /* FIX 1&2: Bigger, more visible text in body copy */
+  .body-text { color: #d1d5db; font-size: 1rem; line-height: 1.75; }
+  .section-desc { color: #c9cdd4; font-size: 1rem; line-height: 1.75; }
+
+  /* Buy Me a Coffee button */
+  .bmc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #FFDD00;
+    color: #000;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .bmc-btn:hover { opacity: 0.9; transform: scale(0.98); }
+
+  /* Contact form styles */
+  .contact-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 0.9rem 1rem;
+    border-radius: 0.75rem;
+    color: #f0f0f2;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .contact-input:focus { border-color: var(--accent); }
+  .contact-input::placeholder { color: #6b7280; }
 </style>
 </head>
 <body>
@@ -109,24 +175,26 @@
       <div class="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center">
         <span class="text-black font-black text-base">M</span>
       </div>
-      <span class="font-extrabold tracking-tighter text-2xl">MINDSET<span class="text-yellow-500">.</span></span>
+      <span class="font-extrabold tracking-tighter text-2xl">El MINDSET INNOVADOR<span class="text-yellow-500">.</span></span>
     </div>
 
     <!-- Desktop nav -->
-    <div class="hidden md:flex gap-8 text-sm font-bold uppercase tracking-widest text-gray-400">
+    <div class="hidden md:flex gap-8 text-sm font-bold uppercase tracking-widest text-gray-300">
       <button onclick="nav('home')"          class="hover:text-white transition py-1">Inicio</button>
       <button onclick="nav('sections')"      class="hover:text-white transition py-1">Secciones</button>
       <button onclick="nav('gamification')"  class="hover:text-white transition py-1">Duelo</button>
       <button onclick="nav('carousel')"      class="hover:text-white transition py-1">Explorar</button>
       <button onclick="nav('frases')"        class="hover:text-white transition py-1">Frases</button>
       <button onclick="nav('autor')"         class="hover:text-white transition py-1">Autor</button>
+      <button onclick="nav('contacto')"      class="hover:text-white transition py-1">Contacto</button>
     </div>
 
     <!-- Right actions -->
     <div class="flex items-center gap-4">
-      <button onclick="nav('download')" class="hidden md:block px-6 py-2.5 rounded-full border border-yellow-500/60 text-yellow-500 text-sm font-bold hover:bg-yellow-500 hover:text-black transition">
+      <!-- FIX 6: Direct PDF download button -->
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="hidden md:block px-6 py-2.5 rounded-full border border-yellow-500/60 text-yellow-500 text-sm font-bold hover:bg-yellow-500 hover:text-black transition">
         DESCARGAR PDF
-      </button>
+      </a>
       <!-- Hamburger -->
       <button id="hamburger" class="md:hidden p-2 rounded-lg hover:bg-white/5 transition" onclick="toggleMobileMenu()">
         <i data-lucide="menu" class="w-6 h-6"></i>
@@ -137,14 +205,15 @@
 
   <!-- Mobile menu -->
   <div id="mobile-menu" class="md:hidden px-6 pb-0 border-t border-white/5 bg-[#0a0a0c]">
-    <div class="py-4 flex flex-col gap-1 text-sm font-bold uppercase tracking-widest text-gray-400">
+    <div class="py-4 flex flex-col gap-1 text-sm font-bold uppercase tracking-widest text-gray-300">
       <button onclick="nav('home');toggleMobileMenu()"         class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Inicio</button>
       <button onclick="nav('sections');toggleMobileMenu()"     class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Secciones</button>
       <button onclick="nav('gamification');toggleMobileMenu()" class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Duelo</button>
       <button onclick="nav('carousel');toggleMobileMenu()"     class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Explorar</button>
       <button onclick="nav('frases');toggleMobileMenu()"       class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Frases</button>
       <button onclick="nav('autor');toggleMobileMenu()"        class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Autor</button>
-      <button onclick="nav('download');toggleMobileMenu()"     class="text-left py-3 px-2 text-yellow-500 hover:text-yellow-400 transition">Descargar PDF</button>
+      <button onclick="nav('contacto');toggleMobileMenu()"     class="text-left py-3 px-2 hover:text-white transition border-b border-white/5">Contacto</button>
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="text-left py-3 px-2 text-yellow-500 hover:text-yellow-400 transition">Descargar PDF</a>
     </div>
   </div>
 </nav>
@@ -156,16 +225,17 @@
 
   <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center min-h-[70vh] relative z-10">
     <div>
-      <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-4">Jesús A. Gaxiola</p>
+      <p class="text-sm font-bold tracking-widest text-yellow-500 uppercase mb-4">Jesús A. Gaxiola</p>
       <h1 class="text-5xl md:text-6xl font-black leading-none mb-6">
         LA INNOVACIÓN<br>ES UN <span class="text-yellow-500 italic" style="font-family:'Playfair Display',serif;">VIAJE</span>.
       </h1>
-      <div class="space-y-3 text-gray-400 text-base font-light leading-relaxed mb-10">
+      <!-- FIX 1&2: More visible, bigger body text -->
+      <div class="space-y-3 text-gray-200 text-lg font-light leading-relaxed mb-10">
         <p>"No se reduce a técnicas ni a teorías: es, ante todo, una forma de pensar y de actuar."</p>
-        <p class="text-white font-medium italic quote-serif">"Conviértelas en acción. Innovar es vivirla."</p>
+        <p class="text-white font-medium italic quote-serif text-xl">"Conviértelas en acción. Innovar es vivirla."</p>
       </div>
       <div class="flex flex-wrap gap-4">
-        <button onclick="nav('sections')"     class="btn-primary px-8 py-4 rounded-xl">EMPEZAR LECTURA</button>
+        <button onclick="nav('sections')"     class="btn-primary px-8 py-4 rounded-xl text-base">EMPEZAR LECTURA</button>
         <button onclick="nav('frases')"       class="px-8 py-4 rounded-xl border border-white/10 hover:bg-white/5 transition text-sm font-bold">VER FRASES</button>
         <button onclick="nav('gamification')" class="px-8 py-4 rounded-xl border border-white/10 hover:bg-white/5 transition text-sm font-bold">PROBAR DUELO</button>
       </div>
@@ -177,36 +247,37 @@
       </div>
       <div class="absolute -bottom-6 -left-6 glass p-5 rounded-2xl shadow-xl">
         <p class="text-sm font-black text-yellow-500">+100 FRASES</p>
-        <p class="text-xs text-gray-400 mt-0.5">Para mentes disruptivas</p>
+        <p class="text-xs text-gray-300 mt-0.5">Para mentes disruptivas</p>
       </div>
       <div class="absolute -top-4 -right-4 glass p-4 rounded-2xl shadow-xl">
-        <p class="text-xs font-bold text-gray-300">5 Secciones</p>
-        <p class="text-xs text-gray-500 mt-0.5">Del origen a la evolución</p>
+        <p class="text-sm font-bold text-gray-200">5 Secciones</p>
+        <p class="text-xs text-gray-400 mt-0.5">Del origen a la evolución</p>
       </div>
     </div>
   </div>
 
-  <!-- ── Liked quotes memory strip ── -->
+  <!-- Liked quotes memory strip -->
   <div id="home-liked-strip" class="hidden max-w-5xl mx-auto mt-20 relative z-10">
     <div class="flex items-center gap-3 mb-5">
       <i data-lucide="heart" class="w-4 h-4 text-red-500 fill-red-500"></i>
-      <p class="text-xs font-bold tracking-widest text-gray-500 uppercase">Frases que te inspiraron</p>
+      <p class="text-xs font-bold tracking-widest text-gray-400 uppercase">Frases que te inspiraron</p>
     </div>
     <div id="home-liked-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-    <p class="text-xs text-gray-600 mt-4">Solo tú ves esto — tu progreso queda guardado aquí.</p>
+    <p class="text-xs text-gray-500 mt-4">Solo tú ves esto — tu progreso queda guardado aquí.</p>
   </div>
 
-  <!-- ── PDF promo banner ── -->
+  <!-- PDF promo banner -->
   <div class="max-w-5xl mx-auto mt-16 relative z-10">
     <div class="glass rounded-2xl border border-yellow-500/20 px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
       <div>
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-1">Acceso completo</p>
-        <p class="text-lg font-black text-white">Llévate el ebook en PDF — gratis.</p>
-        <p class="text-sm text-gray-400 mt-1">+100 frases, ejercicios y herramientas del autor.</p>
+        <p class="text-xl font-black text-white">Llévate el ebook en PDF — gratis.</p>
+        <p class="text-base text-gray-300 mt-1">+100 frases, ejercicios y herramientas del autor.</p>
       </div>
-      <button onclick="nav('download')" class="btn-primary px-8 py-4 rounded-xl text-sm whitespace-nowrap flex-shrink-0">
-        DESCARGAR AHORA
-      </button>
+      <!-- FIX 6: direct download -->
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary px-8 py-4 rounded-xl text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> DESCARGAR AHORA
+      </a>
     </div>
   </div>
 </main>
@@ -216,12 +287,13 @@
   <div class="max-w-7xl mx-auto">
     <header class="mb-10">
       <h2 class="text-4xl font-black mb-6 uppercase">Estructura del Mindset</h2>
-      <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-        <button onclick="loadSection(1)" class="sec-btn active px-5 py-2.5 rounded-xl glass">1. ORIGEN</button>
-        <button onclick="loadSection(2)" class="sec-btn px-5 py-2.5 rounded-xl glass">2. IDEACIÓN</button>
-        <button onclick="loadSection(3)" class="sec-btn px-5 py-2.5 rounded-xl glass">3. ACCIÓN</button>
-        <button onclick="loadSection(4)" class="sec-btn px-5 py-2.5 rounded-xl glass">4. IMPACTO</button>
-        <button onclick="loadSection(5)" class="sec-btn px-5 py-2.5 rounded-xl glass">5. EVOLUCIÓN</button>
+      <!-- FIX 7: stretched full-width section bar -->
+      <div class="sec-nav-wrap">
+        <button onclick="loadSection(1)" class="sec-btn active px-3 py-2.5 rounded-xl glass">1. ORIGEN</button>
+        <button onclick="loadSection(2)" class="sec-btn px-3 py-2.5 rounded-xl glass">2. IDEACIÓN</button>
+        <button onclick="loadSection(3)" class="sec-btn px-3 py-2.5 rounded-xl glass">3. ACCIÓN</button>
+        <button onclick="loadSection(4)" class="sec-btn px-3 py-2.5 rounded-xl glass">4. IMPACTO</button>
+        <button onclick="loadSection(5)" class="sec-btn px-3 py-2.5 rounded-xl glass">5. EVOLUCIÓN</button>
       </div>
     </header>
 
@@ -231,17 +303,18 @@
         <div class="glass p-6 rounded-2xl border-l-4 border-yellow-500 sticky top-28">
           <span id="sec-num" class="text-xs font-bold text-yellow-500 uppercase tracking-widest">Sección 1</span>
           <h3 id="sec-title" class="text-xl font-black text-white mt-1 mb-3">La Semilla</h3>
-          <p id="sec-text" class="text-sm text-gray-400 leading-relaxed mb-4">Cargando...</p>
+          <!-- FIX 1&2: bigger, more visible section text -->
+          <p id="sec-text" class="text-base text-gray-200 leading-relaxed mb-4">Cargando...</p>
           <div id="sec-tags" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <!-- PDF promo inside sections -->
+        <!-- PDF promo inside sections - FIX 6: direct download -->
         <div class="glass p-5 rounded-2xl border border-yellow-500/20">
           <p class="text-xs font-bold text-yellow-500 uppercase tracking-widest mb-2">PDF Completo</p>
-          <p class="text-sm text-gray-300 leading-relaxed mb-4">Descarga todas las páginas en alta resolución con anotaciones del autor.</p>
-          <button onclick="nav('download')" class="btn-primary w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wide">
-            DESCARGAR GRATIS
-          </button>
+          <p class="text-sm text-gray-200 leading-relaxed mb-4">Descarga todas las páginas en alta resolución con anotaciones del autor.</p>
+          <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2">
+            <i data-lucide="download" class="w-3 h-3"></i> DESCARGAR GRATIS
+          </a>
         </div>
       </div>
 
@@ -258,7 +331,8 @@
     <div class="text-center mb-4">
       <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-1">Minijuego</p>
       <h2 class="text-4xl font-black uppercase">Duelo de Páginas</h2>
-      <p class="text-gray-400 mt-2 mb-6">¿Cuál te impacta más? Elige la que más resuena contigo ahora mismo.</p>
+      <!-- FIX 1&2: more visible description -->
+      <p class="text-gray-200 text-lg mt-2 mb-6">¿Cuál te impacta más? Elige la que más resuena contigo ahora mismo.</p>
     </div>
 
     <!-- Score HUD -->
@@ -266,21 +340,21 @@
       <div class="glass px-5 py-3 rounded-2xl flex items-center gap-3">
         <span class="text-yellow-500 text-lg">⚡</span>
         <div class="text-left">
-          <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Racha</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Racha</p>
           <p id="duel-streak" class="text-xl font-black text-white leading-none">0</p>
         </div>
       </div>
       <div class="glass px-5 py-3 rounded-2xl flex items-center gap-3">
         <span class="text-yellow-500 text-lg">🏆</span>
         <div class="text-left">
-          <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Duelos</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Duelos</p>
           <p id="duel-total" class="text-xl font-black text-white leading-none">0</p>
         </div>
       </div>
       <div id="duel-badge-wrap" class="hidden glass px-5 py-3 rounded-2xl flex items-center gap-3">
         <span id="duel-badge-icon" class="text-lg">🔥</span>
         <div class="text-left">
-          <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Rango</p>
+          <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Rango</p>
           <p id="duel-badge-label" class="text-sm font-black text-yellow-500 leading-none">Explorador</p>
         </div>
       </div>
@@ -309,15 +383,15 @@
       </button>
     </div>
 
-    <!-- PDF promo -->
+    <!-- PDF promo - FIX 6: direct download -->
     <div class="mt-10 glass rounded-2xl border border-yellow-500/20 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-1">¿Ya tienes el ebook?</p>
         <p class="text-base font-black text-white">Descárgalo gratis y llévate todas las páginas.</p>
       </div>
-      <button onclick="nav('download')" class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0">
-        OBTENER PDF
-      </button>
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> OBTENER PDF
+      </a>
     </div>
 
   </div>
@@ -329,24 +403,27 @@
     <div class="flex justify-between items-end mb-10">
       <div>
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-2">Descubrimiento</p>
-        <h2 class="text-4xl font-black uppercase leading-none">Páginas<br><span class="text-yellow-500">Aleatorias</span></h2>
+        <h2 class="text-4xl font-black uppercase leading-none">Páginas<br><span class="text-yellow-500">Destacadas</span></h2>
+        <!-- FIX 5: cambiar el texto de páginas aleatorias -->
+        <p class="text-gray-200 text-base mt-3">Páginas seleccionadas al azar del ebook. Haz clic en cualquiera para compartir directamente.</p>
       </div>
       <button onclick="renderCarousel()" class="px-6 py-3 bg-white/5 rounded-xl text-xs font-bold hover:bg-white/10 transition border border-white/10">
         MOSTRAR MÁS
       </button>
     </div>
-    <!-- Fixed-height cards so images never overflow the screen -->
+
+    <!-- FIX 3: Bigger cards on desktop; FIX 4: click to share image -->
     <div id="carousel-track" class="flex gap-5 overflow-x-auto pb-6 no-scrollbar"></div>
 
-    <!-- PDF promo in carousel -->
+    <!-- PDF promo in carousel - FIX 6: direct download -->
     <div class="mt-12 glass rounded-2xl border border-yellow-500/20 px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-6">
       <div>
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-1">¿Te gustan las páginas?</p>
         <p class="text-base font-black text-white">Descárgalas todas en alta calidad.</p>
       </div>
-      <button onclick="nav('download')" class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0">
-        OBTENER PDF GRATIS
-      </button>
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> OBTENER PDF GRATIS
+      </a>
     </div>
   </div>
 </section>
@@ -356,7 +433,8 @@
   <div class="max-w-2xl mx-auto">
     <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-2">Colección</p>
     <h2 class="text-4xl font-black mb-2 uppercase">Frases del Ebook</h2>
-    <p class="text-gray-400 mb-10">Toca el corazón para guardar tus favoritas. Comparte las que te inspiren.</p>
+    <!-- FIX 1&2: bigger, more visible text -->
+    <p class="text-gray-200 text-base mb-10">Toca el corazón para guardar tus favoritas. Comparte las que te inspiren.</p>
 
     <!-- Quote card -->
     <div id="quote-card" class="glass p-8 rounded-3xl border border-white/5 relative overflow-hidden mb-6">
@@ -365,38 +443,39 @@
         <div class="flex justify-between items-center mb-6">
           <span id="q-badge" class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-yellow-500 text-black">El Origen</span>
           <button onclick="shareCurrentQuote()" class="p-2 rounded-lg hover:bg-white/5 transition" title="Compartir">
-            <i data-lucide="share-2" class="w-4 h-4 text-gray-400"></i>
+            <i data-lucide="share-2" class="w-4 h-4 text-gray-300"></i>
           </button>
         </div>
 
-        <p id="q-text" class="quote-serif text-2xl text-white leading-snug mb-8">"Cargando inspiración..."</p>
+        <!-- FIX 1&2: bigger quote text -->
+        <p id="q-text" class="quote-serif text-3xl text-white leading-snug mb-8">"Cargando inspiración..."</p>
 
         <div class="flex justify-between items-center">
           <button id="q-like-btn" onclick="toggleQuoteLike()" class="flex items-center gap-3 group" title="Me gusta">
-            <i id="q-heart" data-lucide="heart" class="w-6 h-6 text-gray-500 transition group-hover:text-red-400"></i>
+            <i id="q-heart" data-lucide="heart" class="w-6 h-6 text-gray-400 transition group-hover:text-red-400"></i>
             <div>
               <span id="q-count" class="text-lg font-bold text-white leading-none block">0</span>
-              <span class="text-[10px] text-gray-500 uppercase tracking-wider">Inspirados</span>
+              <span class="text-[10px] text-gray-400 uppercase tracking-wider">Inspirados</span>
             </div>
           </button>
-          <span id="q-num" class="text-xs text-gray-600 font-bold">1 / 5</span>
+          <span id="q-num" class="text-sm text-gray-400 font-bold">1 / 5</span>
         </div>
       </div>
     </div>
 
-    <button onclick="loadRandomQuote()" class="w-full py-4 glass rounded-2xl border border-white/10 hover:border-yellow-500/40 text-sm font-bold transition flex items-center justify-center gap-2">
+    <button onclick="loadRandomQuote()" class="w-full py-4 glass rounded-2xl border border-white/10 hover:border-yellow-500/40 text-base font-bold transition flex items-center justify-center gap-2">
       Siguiente Pensamiento <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </button>
 
-    <!-- PDF promo in frases -->
+    <!-- PDF promo in frases - FIX 6 direct download -->
     <div class="mt-6 glass rounded-2xl border border-yellow-500/20 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-1">¿Quieres más frases?</p>
         <p class="text-base font-black text-white">El ebook completo tiene +100. Descárgalo gratis.</p>
       </div>
-      <button onclick="nav('download')" class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0">
-        OBTENER PDF
-      </button>
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> OBTENER PDF
+      </a>
     </div>
   </div>
 </section>
@@ -409,13 +488,11 @@
       <h2 class="text-4xl font-black mb-2 uppercase">El Autor</h2>
     </div>
 
-    <!-- Author card – redesigned, larger with photo -->
+    <!-- Author card -->
     <div class="glass rounded-3xl overflow-hidden border border-white/5">
-      <!-- Top accent band -->
       <div class="h-24 bg-gradient-to-r from-yellow-500/20 via-yellow-600/10 to-transparent relative">
         <div class="blob w-48 h-48 bg-yellow-500/15 -top-10 right-0"></div>
       </div>
-      <!-- Avatar overlapping band -->
       <div class="px-6 pb-6 -mt-12 relative">
         <div class="w-24 h-24 rounded-2xl border-4 border-[#0a0a0c] overflow-hidden bg-yellow-500/10 mb-4 shadow-xl">
           <img
@@ -428,16 +505,46 @@
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h4 class="font-black text-white text-2xl leading-tight">Ing. Jesús A. Gaxiola</h4>
-            <p class="text-yellow-500 text-sm font-bold mt-0.5">Autor · Coach · Consultor · </p>
+            <p class="text-yellow-500 text-sm font-bold mt-0.5">Autor · Coach · Consultor</p>
           </div>
-          <div class="flex gap-2">
-            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-gray-400">+15 años de experiencia</span>
+          <div class="flex gap-2 flex-wrap">
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-gray-300">+15 años de experiencia</span>
             <span class="px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-xs font-bold text-yellow-500">+150 artículos publicados</span>
           </div>
         </div>
-        <p class="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
+        <!-- FIX 1&2: more visible bio text -->
+        <p class="text-base text-gray-200 mt-4 leading-relaxed max-w-lg">
           Profesor universitario, coach de negocios y consultor especializado en innovación. Su trabajo se enfoca en detonar el potencial creativo de personas y organizaciones que buscan hacer las cosas de manera diferente.
         </p>
+      </div>
+    </div>
+
+    <!-- FIX 10: Otros libros del autor -->
+    <div class="glass p-6 rounded-2xl border border-white/5">
+      <h4 class="font-bold text-yellow-500 mb-5 uppercase text-xs tracking-widest">Otros libros del autor</h4>
+      <div class="space-y-3">
+        <a href="https://www.amazon.com.mx/s?k=jesus+gaxiola" target="_blank" rel="noopener"
+           class="flex justify-between items-center glass p-4 rounded-xl border border-white/5 hover:border-yellow-500/40 transition group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-lg">📘</div>
+            <div>
+              <h5 class="font-bold text-white group-hover:text-yellow-500 transition">Manual de Analítica Básica</h5>
+              <p class="text-xs text-gray-400 mt-0.5">Disponible en Amazon · Jesús A. Gaxiola</p>
+            </div>
+          </div>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition flex-shrink-0"></i>
+        </a>
+        <a href="https://www.amazon.com.mx/s?k=jesus+gaxiola" target="_blank" rel="noopener"
+           class="flex justify-between items-center glass p-4 rounded-xl border border-white/5 hover:border-yellow-500/40 transition group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-lg">📗</div>
+            <div>
+              <h5 class="font-bold text-white group-hover:text-yellow-500 transition">Ver todos los libros del autor</h5>
+              <p class="text-xs text-gray-400 mt-0.5">Amazon · Colección completa</p>
+            </div>
+          </div>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition flex-shrink-0"></i>
+        </a>
       </div>
     </div>
 
@@ -445,10 +552,9 @@
     <div class="glass p-6 rounded-2xl">
       <h4 class="font-bold text-yellow-500 mb-5 uppercase text-xs tracking-widest">Reseñas de lectores</h4>
 
-      <!-- Static + user reviews list -->
       <div id="reviews-list" class="space-y-5 mb-6">
         <div class="border-l-2 border-yellow-500/30 pl-4">
-          <p class="quote-serif text-gray-300 text-base leading-relaxed">"No es un libro para leer de corrido; es un botiquín de primeros auxilios para cuando estás bloqueado en un proyecto."</p>
+          <p class="quote-serif text-gray-200 text-base leading-relaxed">"No es un libro para leer de corrido; es un botiquín de primeros auxilios para cuando estás bloqueado en un proyecto."</p>
           <footer class="text-xs text-gray-500 mt-2 flex items-center gap-2">
             <span class="text-yellow-500">★★★★★</span>
             <span>— Emprendedor Tech</span>
@@ -456,21 +562,18 @@
         </div>
       </div>
 
-      <!-- Review gate: shown if NOT downloaded; hidden if downloaded -->
       <div id="review-gate" class="border-t border-white/5 pt-5">
-        <!-- Locked state (default) -->
         <div id="review-locked" class="text-center py-6">
           <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3">
-            <i data-lucide="lock" class="w-5 h-5 text-gray-500"></i>
+            <i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
           </div>
           <p class="text-sm font-bold text-white mb-1">Reseña disponible tras descargar</p>
-          <p class="text-xs text-gray-500 mb-4">Descarga el ebook y comparte tu opinión con la comunidad.</p>
-          <button onclick="nav('download')" class="btn-primary px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide">
-            DESCARGAR GRATIS
-          </button>
+          <p class="text-sm text-gray-400 mb-4">Descarga el ebook y comparte tu opinión con la comunidad.</p>
+          <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide inline-flex items-center gap-2">
+            <i data-lucide="download" class="w-3 h-3"></i> DESCARGAR GRATIS
+          </a>
         </div>
 
-        <!-- Unlocked state (shown when hasDownloaded) -->
         <div id="review-form" class="hidden">
           <p class="text-sm font-bold text-white mb-4">Deja tu reseña</p>
           <div class="space-y-3">
@@ -481,18 +584,8 @@
               <button onclick="setRating(4)" class="star-btn text-2xl text-gray-600 hover:text-yellow-500 transition">★</button>
               <button onclick="setRating(5)" class="star-btn text-2xl text-gray-600 hover:text-yellow-500 transition">★</button>
             </div>
-            <input
-              type="text"
-              id="review-name"
-              placeholder="Tu nombre o alias"
-              class="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-yellow-500 transition text-sm"
-            >
-            <textarea
-              id="review-text"
-              placeholder="Escribe tu opinión sobre el ebook..."
-              rows="3"
-              class="w-full bg-white/5 border border-white/10 p-3 rounded-xl focus:outline-none focus:border-yellow-500 transition text-sm resize-none"
-            ></textarea>
+            <input type="text" id="review-name" placeholder="Tu nombre o alias" class="contact-input">
+            <textarea id="review-text" placeholder="Escribe tu opinión sobre el ebook..." rows="3" class="contact-input resize-none"></textarea>
             <button onclick="submitReview()" class="btn-primary w-full py-3 rounded-xl text-sm font-bold uppercase tracking-wide">
               PUBLICAR RESEÑA
             </button>
@@ -504,63 +597,136 @@
       </div>
     </div>
 
-   <div class="space-y-3">
-  <h4 class="font-bold text-white mb-4 uppercase text-xs tracking-widest">Redes sociales</h4>
+    <!-- Social links -->
+    <div class="space-y-3">
+      <h4 class="font-bold text-white mb-4 uppercase text-xs tracking-widest">Redes sociales</h4>
 
-  <a href="https://jesusgaxiola.com/" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
-    <div class="flex items-center gap-4">
-      <i data-lucide="globe" class="w-6 h-6 text-gray-400 group-hover:text-yellow-500 transition"></i>
-      <div>
-        <h5 class="font-bold text-white group-hover:text-yellow-500 transition">Sitio web</h5>
-        <p class="text-xs text-gray-500">Enlace directo</p>
-      </div>
+      <a href="https://jesusgaxiola.com/" target="_blank" rel="noopener" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
+        <div class="flex items-center gap-4">
+          <i data-lucide="globe" class="w-6 h-6 text-gray-300 group-hover:text-yellow-500 transition"></i>
+          <div>
+            <h5 class="font-bold text-white group-hover:text-yellow-500 transition">Sitio web</h5>
+            <p class="text-sm text-gray-400">Enlace directo</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition"></i>
+      </a>
+
+      <a href="https://www.linkedin.com/in/jesusgaxiola/" target="_blank" rel="noopener" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
+        <div class="flex items-center gap-4">
+          <i data-lucide="linkedin" class="w-6 h-6 text-gray-300 group-hover:text-yellow-500 transition"></i>
+          <div>
+            <h5 class="font-bold text-white group-hover:text-yellow-500 transition">LinkedIn</h5>
+            <p class="text-sm text-gray-400">Enlace directo</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition"></i>
+      </a>
+
+      <a href="https://www.youtube.com/@jesusgaxiola" target="_blank" rel="noopener" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
+        <div class="flex items-center gap-4">
+          <i data-lucide="youtube" class="w-6 h-6 text-gray-300 group-hover:text-yellow-500 transition"></i>
+          <div>
+            <h5 class="font-bold text-white group-hover:text-yellow-500 transition">YouTube</h5>
+            <p class="text-sm text-gray-400">Enlace directo</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition"></i>
+      </a>
+
+      <a href="https://x.com/jesusgaxiola" target="_blank" rel="noopener" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
+        <div class="flex items-center gap-4">
+          <i data-lucide="twitter" class="w-6 h-6 text-gray-300 group-hover:text-yellow-500 transition"></i>
+          <div>
+            <h5 class="font-bold text-white group-hover:text-yellow-500 transition">X</h5>
+            <p class="text-sm text-gray-400">Enlace directo</p>
+          </div>
+        </div>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 group-hover:text-yellow-500 transition"></i>
+      </a>
     </div>
-    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 group-hover:text-yellow-500 transition"></i>
-  </a>
 
-  <a href="https://www.linkedin.com/in/jesusgaxiola/" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
-    <div class="flex items-center gap-4">
-      <i data-lucide="linkedin" class="w-6 h-6 text-gray-400 group-hover:text-yellow-500 transition"></i>
-      <div>
-        <h5 class="font-bold text-white group-hover:text-yellow-500 transition">Linkedin</h5>
-        <p class="text-xs text-gray-500">Enlace directo</p>
-      </div>
+    <!-- FIX 9: Buy Me a Coffee -->
+    <div class="glass rounded-2xl border border-yellow-500/20 px-6 py-6 text-center">
+      <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-2">Apoya al autor</p>
+      <p class="text-base font-black text-white mb-1">¿Te gustó el contenido?</p>
+      <p class="text-sm text-gray-300 mb-5">Si este ebook te aportó valor, considera invitarle un café al autor.</p>
+      <a href="https://www.buymeacoffee.com/jesusgaxiola" target="_blank" rel="noopener" class="bmc-btn">
+        ☕ Buy Me a Coffee
+      </a>
     </div>
-    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 group-hover:text-yellow-500 transition"></i>
-  </a>
 
-  <a href="https://www.youtube.com/@jesusgaxiola" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
-    <div class="flex items-center gap-4">
-      <i data-lucide="youtube" class="w-6 h-6 text-gray-400 group-hover:text-yellow-500 transition"></i>
-      <div>
-        <h5 class="font-bold text-white group-hover:text-yellow-500 transition">Youtube</h5>
-        <p class="text-xs text-gray-500">Enlace directo</p>
-      </div>
-    </div>
-    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 group-hover:text-yellow-500 transition"></i>
-  </a>
-
-  <a href="https://x.com/jesusgaxiola" class="glass p-5 rounded-2xl flex justify-between items-center group hover:border-yellow-500/40 transition border border-white/5">
-    <div class="flex items-center gap-4">
-      <i data-lucide="twitter" class="w-6 h-6 text-gray-400 group-hover:text-yellow-500 transition"></i>
-      <div>
-        <h5 class="font-bold text-white group-hover:text-yellow-500 transition">X</h5>
-        <p class="text-xs text-gray-500">Enlace directo</p>
-      </div>
-    </div>
-    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600 group-hover:text-yellow-500 transition"></i>
-  </a>
-</div>
-
-    <!-- PDF promo in autor -->
+    <!-- PDF promo in autor - FIX 6 direct download -->
     <div class="glass rounded-2xl border border-yellow-500/20 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-1">PDF Completo</p>
         <p class="text-base font-black text-white">Llévate el ebook — es gratis.</p>
       </div>
-      <button onclick="nav('download')" class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0">
-        DESCARGAR
-      </button>
+      <a href="assets/pdf/ebook_mindset_innovador.pdf" download class="btn-primary px-7 py-3 rounded-xl text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> DESCARGAR
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ CONTACTO ══ (FIX 8) -->
+<section id="contacto" class="view pt-36 px-6 pb-20">
+  <div class="max-w-xl mx-auto">
+    <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-3">Comunícate</p>
+    <h2 class="text-4xl font-black mb-3 uppercase">Contáctame</h2>
+    <p class="text-gray-200 text-base mb-10 leading-relaxed">¿Tienes preguntas, quieres una consultoría o simplemente quieres compartir cómo el ebook te ayudó? Escríbeme.</p>
+
+    <div class="glass p-8 rounded-[2.5rem] border border-white/10 relative overflow-hidden">
+      <div class="blob w-64 h-64 bg-yellow-500/8 -top-20 -right-20"></div>
+      <div class="relative z-10 space-y-4">
+        <div>
+          <label class="text-xs font-bold text-gray-300 uppercase tracking-widest block mb-2">Nombre</label>
+          <input type="text" id="contact-name" placeholder="Tu nombre completo" class="contact-input">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-300 uppercase tracking-widest block mb-2">Correo electrónico</label>
+          <input type="email" id="contact-email" placeholder="tu@correo.com" class="contact-input">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-300 uppercase tracking-widest block mb-2">Asunto</label>
+          <input type="text" id="contact-subject" placeholder="¿Sobre qué deseas hablar?" class="contact-input">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-300 uppercase tracking-widest block mb-2">Mensaje</label>
+          <textarea id="contact-message" placeholder="Escribe tu mensaje aquí..." rows="5" class="contact-input resize-none"></textarea>
+        </div>
+        <button onclick="sendContact()" class="btn-primary w-full py-4 rounded-2xl text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          Enviar Mensaje
+        </button>
+        <div id="contact-success" class="hidden text-center text-green-400 font-bold text-sm py-3 px-4 bg-green-500/10 rounded-xl border border-green-500/20">
+          ✅ ¡Mensaje enviado! Te responderé pronto.
+        </div>
+        <div id="contact-error" class="hidden text-center text-red-400 font-bold text-sm py-3 px-4 bg-red-500/10 rounded-xl border border-red-500/20">
+          Por favor completa todos los campos.
+        </div>
+      </div>
+    </div>
+
+    <!-- Alternative contact methods -->
+    <div class="mt-8 space-y-3">
+      <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">O contáctame directamente</h4>
+      <a href="https://jesusgaxiola.com/" target="_blank" rel="noopener" class="glass p-4 rounded-xl flex items-center gap-4 hover:border-yellow-500/40 transition border border-white/5 group">
+        <i data-lucide="globe" class="w-5 h-5 text-gray-300 group-hover:text-yellow-500 transition flex-shrink-0"></i>
+        <span class="text-sm text-gray-200 group-hover:text-white transition">jesusgaxiola.com</span>
+      </a>
+      <a href="https://www.linkedin.com/in/jesusgaxiola/" target="_blank" rel="noopener" class="glass p-4 rounded-xl flex items-center gap-4 hover:border-yellow-500/40 transition border border-white/5 group">
+        <i data-lucide="linkedin" class="w-5 h-5 text-gray-300 group-hover:text-yellow-500 transition flex-shrink-0"></i>
+        <span class="text-sm text-gray-200 group-hover:text-white transition">LinkedIn — Jesús A. Gaxiola</span>
+      </a>
+    </div>
+
+    <!-- FIX 9: Buy Me a Coffee also in contacto -->
+    <div class="mt-8 glass rounded-2xl border border-yellow-500/20 px-6 py-6 text-center">
+      <p class="text-sm text-gray-300 mb-4">Si este ebook te fue útil, puedes apoyar al autor con un café ☕</p>
+      <a href="https://www.buymeacoffee.com/jesusgaxiola" target="_blank" rel="noopener" class="bmc-btn">
+        ☕ Buy Me a Coffee
+      </a>
     </div>
   </div>
 </section>
@@ -573,21 +739,12 @@
       <div class="relative z-10">
         <p class="text-xs font-bold tracking-widest text-yellow-500 uppercase mb-3">Acceso completo</p>
         <h2 class="text-4xl font-black mb-3">Finaliza el viaje.</h2>
-        <p class="text-gray-400 mb-8 leading-relaxed">Únete a la comunidad de innovadores y recibe el PDF completo junto con herramientas exclusivas de Jesús A. Gaxiola.</p>
+        <p class="text-gray-200 text-base mb-8 leading-relaxed">Únete a la comunidad de innovadores y descarga el PDF completo con herramientas exclusivas de Jesús A. Gaxiola.</p>
 
         <div class="space-y-4">
-          <input
-            type="text"
-            id="lead-name"
-            placeholder="Tu nombre"
-            class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:outline-none focus:border-yellow-500 transition text-sm"
-          >
-          <input
-            type="email"
-            id="lead-email"
-            placeholder="tu@email.com"
-            class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl focus:outline-none focus:border-yellow-500 transition text-sm"
-          >
+          <input type="text" id="lead-name" placeholder="Tu nombre" class="contact-input">
+          <input type="email" id="lead-email" placeholder="tu@email.com" class="contact-input">
+          <!-- FIX 6: direct download on submit -->
           <button onclick="saveLead()" class="btn-primary w-full py-4 rounded-2xl text-sm uppercase tracking-wider flex items-center justify-center gap-2">
             <i data-lucide="download" class="w-4 h-4"></i>
             Descargar Ebook Ahora
@@ -657,8 +814,6 @@ const DUEL_BADGES = [
 
 let currentQuote  = QUOTES[0];
 let selectedRating = 0;
-
-// Duel state (session only — not critical to persist)
 let duelStreak = 0;
 let duelTotal  = parseInt(localStorage.getItem('duelTotal') || '0');
 
@@ -717,7 +872,7 @@ function renderHomeLiked() {
       <p class="quote-serif text-sm text-gray-200 mt-2 leading-relaxed">"${q.text}"</p>
       <div class="flex items-center gap-1 mt-3">
         <i data-lucide="heart" class="w-3 h-3 text-red-500 fill-red-500"></i>
-        <span class="text-[10px] text-gray-500">Marcada como favorita</span>
+        <span class="text-[10px] text-gray-400">Marcada como favorita</span>
       </div>
     </div>
   `).join('');
@@ -753,10 +908,10 @@ function loadSection(num) {
           class="w-full aspect-[3/4] object-cover rounded-2xl mb-4 bg-gray-900"
           loading="lazy" onerror="this.style.background='#1a1a1f'">
         <div class="flex justify-between items-center px-1">
-          <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pág. ${i}</span>
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Pág. ${i}</span>
           <button onclick="togglePageLike(this, ${i})" class="flex items-center gap-2">
             <i data-lucide="heart" class="w-5 h-5 transition ${liked ? 'heart-active' : 'text-gray-600'}"></i>
-            <span class="text-xs font-bold text-gray-500 like-count">${count}</span>
+            <span class="text-xs font-bold text-gray-400 like-count">${count}</span>
           </button>
         </div>
       </div>
@@ -822,10 +977,7 @@ function pickCard(side) {
   duelTotal++;
   localStorage.setItem('duelTotal', duelTotal);
 
-  const msgs = duelStreak >= 5
-    ? [`🔥 ¡Racha de ${duelStreak}! Imparable.`]
-    : ['✅ ¡Buena elección!', '⚡ ¡Sigue así!', '🎯 Bien jugado.', '💡 Interesante.'];
-
+  const msgs = ['✅ ¡Buena elección!', '⚡ ¡Sigue así!', '🎯 Bien jugado.', '💡 Interesante.'];
   flashResult(duelStreak >= 5
     ? `🔥 ¡Racha de ${duelStreak}! Imparable.`
     : msgs[Math.floor(Math.random() * msgs.length)]);
@@ -847,7 +999,7 @@ function renderDuel() {
            class="w-full rounded-2xl mb-4 shadow-xl aspect-[3/4] object-cover bg-gray-900
                   group-hover:scale-[1.01] transition-transform duration-200">
       <div class="flex justify-between items-center">
-        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pág. ${n}</span>
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Pág. ${n}</span>
         <span class="py-1.5 px-5 bg-yellow-500 rounded-full text-black font-black text-xs
                      group-hover:bg-yellow-400 transition shadow-md shadow-yellow-500/20">
           ESTA ⚡
@@ -862,7 +1014,42 @@ function renderDuel() {
 }
 
 
-// ─── CAROUSEL ────────────────────────────────────────────────────────────────
+// ─── CAROUSEL (FIX 3 + FIX 4 + FIX 5) ──────────────────────────────────────
+
+// FIX 4: Share image directly from carousel
+async function sharePageImage(pageNum) {
+  const imgSrc = `assets/png/${pageNum}.png`;
+  const shareText = `Página ${pageNum} del ebook "El Mindset Innovador" de Jesús A. Gaxiola`;
+
+  // Try to share the image as a file
+  if (navigator.share) {
+    try {
+      const response = await fetch(imgSrc);
+      const blob = await response.blob();
+      const file = new File([blob], `mindset_pagina_${pageNum}.png`, { type: 'image/png' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Mindset Innovador',
+          text: shareText,
+          files: [file]
+        });
+        return;
+      }
+
+      // Fallback: share URL
+      await navigator.share({ title: 'Mindset Innovador', text: shareText, url: window.location.href });
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        // Last resort: open image in new tab
+        window.open(imgSrc, '_blank');
+      }
+    }
+  } else {
+    // Desktop: open the image directly
+    window.open(imgSrc, '_blank');
+  }
+}
 
 function renderCarousel() {
   const track = document.getElementById('carousel-track');
@@ -874,14 +1061,26 @@ function renderCarousel() {
     do { rand = Math.floor(Math.random() * (125 - 8 + 1)) + 8; } while (used.has(rand));
     used.add(rand);
 
+    // FIX 3: bigger cards on desktop (via CSS .carousel-card)
+    // FIX 4: click to share image directly
     track.insertAdjacentHTML('beforeend', `
-      <div class="flex-shrink-0 w-52 glass rounded-3xl overflow-hidden border border-white/5 hover:border-yellow-500/30 transition group" style="height:280px;">
+      <div class="carousel-card glass cursor-pointer relative overflow-hidden group"
+           onclick="sharePageImage(${rand})" title="Toca para compartir esta página">
         <img src="assets/png/${rand}.png" alt="Pág. ${rand}"
-             class="w-full h-full object-cover opacity-75 group-hover:opacity-100 transition bg-gray-900"
+             class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition bg-gray-900"
              loading="lazy">
+        <!-- Share overlay hint -->
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
+          <i data-lucide="share-2" class="w-8 h-8 text-white"></i>
+          <span class="text-white text-xs font-bold uppercase tracking-widest">Compartir</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
+          <span class="text-xs font-bold text-gray-200">Pág. ${rand}</span>
+        </div>
       </div>
     `);
   }
+  lucide.createIcons();
 }
 
 
@@ -952,7 +1151,6 @@ function renderReviewGate() {
   document.getElementById('review-form').classList.toggle('hidden',   !downloaded);
 }
 
-
 // ─── REVIEWS ─────────────────────────────────────────────────────────────────
 
 function setRating(val) {
@@ -982,25 +1180,23 @@ function submitReview() {
   setRating(0);
   document.getElementById('review-success').classList.remove('hidden');
   setTimeout(() => document.getElementById('review-success').classList.add('hidden'), 3000);
-
   renderSavedReviews();
 }
 
 function renderSavedReviews() {
   const reviews = getReviews();
   if (!reviews.length) return;
-  const list     = document.getElementById('reviews-list');
+  const list    = document.getElementById('reviews-list');
   const existing = list.querySelector('div');
-  const stars    = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
+  const stars   = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
 
-  // Remove any previously injected user reviews to avoid duplicates
   list.querySelectorAll('.user-review').forEach(el => el.remove());
 
   reviews.forEach(r => {
     const div = document.createElement('div');
     div.className = 'user-review border-l-2 border-white/10 pl-4';
     div.innerHTML = `
-      <p class="quote-serif text-gray-300 text-base leading-relaxed">"${r.text}"</p>
+      <p class="quote-serif text-gray-200 text-base leading-relaxed">"${r.text}"</p>
       <footer class="text-xs text-gray-500 mt-2 flex items-center gap-2">
         <span class="text-yellow-500">${stars(r.rating)}</span>
         <span>— ${r.name}</span>
@@ -1011,7 +1207,7 @@ function renderSavedReviews() {
 }
 
 
-// ─── LEAD CAPTURE ────────────────────────────────────────────────────────────
+// ─── LEAD CAPTURE (FIX 6: direct download) ───────────────────────────────────
 
 function saveLead() {
   const name  = document.getElementById('lead-name').value.trim();
@@ -1026,7 +1222,43 @@ function saveLead() {
   document.getElementById('lead-name').value  = '';
   document.getElementById('lead-email').value = '';
 
-  setTimeout(() => { window.open('assets/pdf/ebook_mindset_innovador.pdf', '_blank'); }, 800);
+  // FIX 6: direct download (not just open)
+  const link = document.createElement('a');
+  link.href = 'assets/pdf/ebook_mindset_innovador.pdf';
+  link.download = 'ebook_mindset_innovador.pdf';
+  link.click();
+}
+
+
+// ─── CONTACT FORM (FIX 8) ────────────────────────────────────────────────────
+
+function sendContact() {
+  const name    = document.getElementById('contact-name').value.trim();
+  const email   = document.getElementById('contact-email').value.trim();
+  const subject = document.getElementById('contact-subject').value.trim();
+  const message = document.getElementById('contact-message').value.trim();
+
+  const errEl = document.getElementById('contact-error');
+  const sucEl = document.getElementById('contact-success');
+  errEl.classList.add('hidden');
+  sucEl.classList.add('hidden');
+
+  if (!name || !email || !email.includes('@') || !message) {
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  // Build mailto link so the user's email client opens with the form filled
+  const mailtoBody = `Nombre: ${name}\nEmail: ${email}\n\n${message}`;
+  const mailtoUrl  = `mailto:jesus@jesusgaxiola.com?subject=${encodeURIComponent(subject || 'Contacto desde Mindset Innovador')}&body=${encodeURIComponent(mailtoBody)}`;
+  window.location.href = mailtoUrl;
+
+  // Show success
+  sucEl.classList.remove('hidden');
+  document.getElementById('contact-name').value    = '';
+  document.getElementById('contact-email').value   = '';
+  document.getElementById('contact-subject').value = '';
+  document.getElementById('contact-message').value = '';
 }
 
 
